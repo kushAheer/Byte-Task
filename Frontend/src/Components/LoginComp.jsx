@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import classes from './LoginComp.module.css'
 import { useSelector } from 'react-redux'
 // import githubLogo from '../../public/github-mark-white.png'
@@ -13,6 +13,17 @@ function LoginComp() {
 
 	// const {loading , loginFunction} = useLogin()
 	const dispatch = useDispatch()
+
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search)
+		const token = params.get('token')
+
+		if (token) {
+			localStorage.setItem('token', token)
+		}
+		
+	},[])
 
 	
 	

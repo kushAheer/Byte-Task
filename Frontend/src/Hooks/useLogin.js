@@ -10,19 +10,22 @@ function useLogin() {
     const [loading , setLoading] = useState(false)
     const [userData , setUserData] = useState(null)
     const dispatch = useDispatch()
-    
+     
     const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login/success`
     console.log(url)
     useEffect(() => {
         const getLoginData = async () => {
             try{
                 console.log("FETCHING USER DATA")
+                // const gitHubId = localStorage.getItem('githubId');
+                // const googleId = localStorage.getItem('googleId') || null;
+                const token = localStorage.getItem('token') || null
                 const res = await fetch(url, {
                     method: "GET",
                     credentials: "include",
 
                     headers: {
-                      
+                      "Authorization": `Bearer ${token}`,
                       "Content-Type": "application/json",
                       "credentials": "include",
                       
@@ -30,8 +33,8 @@ function useLogin() {
                 }).then((response) => response.json())
                 console.log(res)
                 if(res.success && res.type === "github"){
-                    dispatch(gitLogin(res.user))
-                    setUserData(res.user)
+                    dispatch(gitLogin(res.user.user))
+                    setUserData(res.user.user)
                     setLoading(false)
                     
                 }else if(res.success && res.type === "google"){

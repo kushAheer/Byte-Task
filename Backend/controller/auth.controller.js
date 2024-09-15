@@ -7,19 +7,25 @@ export const  gitAuth = async (req, res) => {
     passport.authenticate('github', { scope: [ 'user:email' ] })(req, res);
 }
 
-export const callBackFunction = async (req, res) => {
-    
-    passport.authenticate('github', { failureRedirect: process.env.CLIENT_URL_LOGIN })(req, res, () => {    
-
-        if(req.user){
-            console.log('req.user', req.user);
+export const callBackFunction = async (req, res, next) => {
+    passport.authenticate('github', { failureRedirect: process.env.CLIENT_URL_LOGIN }, (err, user, info) => {
+        if (err) {
+            return next(err);
         }
-        res.redirect(process.env.CLIENT_URL_LOGIN);
+        if (!user) {
+            return res.redirect(process.env.CLIENT_URL_LOGIN);
+        }
 
+        req.logIn(user, (err) => {
+            if (err) {
+                return next(err);
+            }
 
-    }   
-    );
-}
+            const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            res.redirect(`${process.env.CLIENT_URL_LOGIN}?token=${token}`);
+        });
+    })(req, res, next);
+};
 
 export const googleAuth = async (req, res) => {
     passport.authenticate('google', { scope: ['email', 'profile', 'https://www.googleapis.com/auth/youtube.readonly', 'openid'], prompt: 'consent' })(req, res);
@@ -45,33 +51,63 @@ export const loginSuccess = async (req, res) => {
         
         // const accessToken = req.headers.authorization?.split(' ')[1];
         
+            const token = req.headers.authorization?.split(' ')[1];
+
+            const user = jwt.decode(token);
+            if(token){
+                if(user.type === 'github'){
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Login success',
+                        type: user.type,
+                        user,
+                    });
+                }else{
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Login success',
+                        type: user.type,
+                        user,
+                    });
+                }
+                
+            }else{
+                return res.status(401).json({
+                    success: false,
+                    message: 'Login failed',
+                    user
+                });
+            }
+            
         
         
-        console.log(req);
-        if (req.user) {
-            // console.log('req.user', req.user);
-            const type = req.user.provider;
-            // const data = {
-            //     username: req.user.username,
-            //     email: req.user.email,
-            //     avatar: req.user.avatar,
-            //     accessToken: req.user.accessToken
-            // }
         
-            return res.status(200).json({
-                type: type,
-                token : req.user.accessToken,
-                success: true,
-                message: 'Login success',
-                user: req.user,
-            })
-        }else{
-            res.status(401).json({
-                success: false,
-                message: 'Login failed',
-                user : req.user
-            });
-        }
+        
+        // console.log(req);
+        // if (req.user) {
+        //     // console.log('req.user', req.user);
+        //     const type = req.user.provider;
+        //     // const data = {
+        //     //     username: req.user.username,
+        //     //     email: req.user.email,
+        //     //     avatar: req.user.avatar,
+        //     //     accessToken: req.user.accessToken
+        //     // }
+        
+        //     return res.status(200).json({
+        //         type: type,
+        //         token : req.user.accessToken,
+        //         success: true,
+        //         message: 'Login success',
+        //         user: req.user,
+        //     })
+        // }else{
+        //     res.status(401).json({
+        //         success: false,
+        //         message: 'Login failed',
+        //         user : req.user
+        //     });
+        // }
         
     } catch (error) {
         return res.status(500).json({
@@ -175,8 +211,6 @@ export const logout = async (req, res) => {
             });
         }
 
-        
-        
 
         req.logout(() => {
             req.session.destroy((err) => {
