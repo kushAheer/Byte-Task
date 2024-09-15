@@ -22,7 +22,7 @@ export const callBackFunction = async (req, res, next) => {
             }
 
             const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.redirect(`${process.env.CLIENT_URL_LOGIN}?token=${token}`);
+            res.redirect(`${process.env.CLIENT_URL_LOGIN}?gittoken=${token}`);
         });
     })(req, res, next);
 };
@@ -34,7 +34,7 @@ export const googleAuth = async (req, res) => {
 export const googleCallBack = async (req, res) => {
     passport.authenticate('google', { failureRedirect: process.env.CLIENT_URL_LOGIN })(req, res, () => {
         const token = jwt.sign({ user: req.user , type : 'google'}, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.redirect(`${process.env.CLIENT_URL_LOGIN}?token=${token}`);
+        res.redirect(`${process.env.CLIENT_URL_LOGIN}?googletoken=${token}`);
     });
 }
 
@@ -52,11 +52,12 @@ export const loginSuccess = async (req, res) => {
         
         // const accessToken = req.headers.authorization?.split(' ')[1];
         
-            const token = req.headers.authorization?.split(' ')[1];
+            const gitToken = req.query.gittoken;
+            const googleToken = req.query.googletoken;
 
-            const user = jwt.decode(token);
-            if(token){
-                
+            
+            if(gitToken){
+                const user = jwt.decode(gitToken);
                 return res.status(200).json({
                     success: true,
                     message: 'Login success',
@@ -65,6 +66,7 @@ export const loginSuccess = async (req, res) => {
                 });
             
             }else{
+                const user = jwt.decode(googleToken);
                 return res.status(401).json({
                     success: false,
                     message: 'Login failed',

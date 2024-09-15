@@ -19,13 +19,15 @@ function useLogin() {
                 console.log("FETCHING USER DATA")
                 // const gitHubId = localStorage.getItem('githubId');
                 // const googleId = localStorage.getItem('googleId') || null;
-                const token = localStorage.getItem('token') || null
+                const gitToken = localStorage.getItem('gitToken') || null;
+                const googleToken = localStorage.getItem('googleToken') || null;
                 const res = await fetch(url, {
                     method: "GET",
                     credentials: "include",
 
                     headers: {
-                      "Authorization": `Bearer ${token}`,
+                      "gittoken" : gitToken,
+                        "googletoken" : googleToken,
                       "Content-Type": "application/json",
                       "credentials": "include",
                       
@@ -38,7 +40,7 @@ function useLogin() {
                     setLoading(false)
                     
                 }else if(res.success && res.type === "google"){
-                    dispatch(googleLogin(res.user))
+                    dispatch(googleLogin(res.user.user))
                     setUserData(res.user)
                     setLoading(false)
                 }else{

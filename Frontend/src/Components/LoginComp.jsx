@@ -17,10 +17,15 @@ function LoginComp() {
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search)
-		const token = params.get('token')
+		const gittoken = params.get('gittoken') 
+		const googletoken = params.get('googletoken')
 
-		if (token) {
-			localStorage.setItem('token', token)
+		if(gittoken){
+			localStorage.setItem('gitToken', gittoken)
+			
+		}
+		if(googletoken){
+			localStorage.setItem('googleToken', googletoken)
 		}
 		window.history.replaceState({}, document.title, "/login")
 		
@@ -33,6 +38,7 @@ function LoginComp() {
 	const handleGitLogin = async () => {
 		// await loginFunction()
 		const url = `${import.meta.env.VITE_BACKEND_URL}/auth/github`
+		
 		console.log(url)
 		window.location.href = url
 
@@ -54,6 +60,7 @@ function LoginComp() {
 			})
 			dispatch(gitLogout());
 			dispatch(setGitHubVerified())
+			localStorage.removeItem('gitToken')
 		} else {
 			await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
 				method: "POST",
@@ -65,6 +72,7 @@ function LoginComp() {
 			})
 			dispatch(googleLogout());
 			dispatch(setYouTubeVerified());
+			localStorage.removeItem('googleToken')
 		}
 
 	}
