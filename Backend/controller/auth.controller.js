@@ -9,7 +9,7 @@ export const  gitAuth = async (req, res) => {
 
 export const callBackFunction = async (req, res, next) => {
     passport.authenticate('github', { failureRedirect: process.env.CLIENT_URL_LOGIN })(req, res, ()=>{
-        const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ user : req.user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.redirect(`${process.env.CLIENT_URL_LOGIN}?gittoken=${token}`);
     });
 };
@@ -42,6 +42,14 @@ export const loginSuccess = async (req, res) => {
         const gitToken = req.headers.gittoken;
         const googleToken = req.headers.googletoken;
         
+        if(!gitToken && !googleToken){
+            return res.status(401).json({
+                success: false,
+                
+            });
+        }
+
+
         if (gitToken && !googleToken) {
             const user = jwt.decode(gitToken);
             return res.status(200).json({
