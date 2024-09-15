@@ -33,7 +33,8 @@ export const googleAuth = async (req, res) => {
 
 export const googleCallBack = async (req, res) => {
     passport.authenticate('google', { failureRedirect: process.env.CLIENT_URL_LOGIN })(req, res, () => {
-        res.redirect(process.env.CLIENT_URL_LOGIN);
+        const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.redirect(`${process.env.CLIENT_URL_LOGIN}?token=${token}`);
     });
 }
 
@@ -55,22 +56,14 @@ export const loginSuccess = async (req, res) => {
 
             const user = jwt.decode(token);
             if(token){
-                if(user.type === 'github'){
-                    return res.status(200).json({
-                        success: true,
-                        message: 'Login success',
-                        type: user.type,
-                        user,
-                    });
-                }else{
-                    return res.status(200).json({
-                        success: true,
-                        message: 'Login success',
-                        type: user.type,
-                        user,
-                    });
-                }
                 
+                return res.status(200).json({
+                    success: true,
+                    message: 'Login success',
+                    type: user.type,
+                    user,
+                });
+            
             }else{
                 return res.status(401).json({
                     success: false,
