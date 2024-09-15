@@ -47,7 +47,7 @@ export const loginSuccess = async (req, res) => {
         
         
         
-
+        console.log(req);
         if (req.user) {
             // console.log('req.user', req.user);
             const type = req.user.provider;
@@ -69,7 +69,7 @@ export const loginSuccess = async (req, res) => {
             res.status(401).json({
                 success: false,
                 message: 'Login failed',
-                req : req
+                user : req.user
             });
         }
         
