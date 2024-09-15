@@ -44,8 +44,17 @@ function useLogin() {
                     setUserData(res.user.user)
                     setLoading(false)
                 }else if(res.success && res.type === "both"){
-                    dispatch(gitLogin(res.gitUser.user))
-                    dispatch(googleLogin(res.googleUser.user))
+                    if(res.gitUser && res.googleUser){
+
+                        dispatch(gitLogin(res.gitUser.user))
+                        dispatch(googleLogin(res.googleUser.user))
+                    }else{
+                        if(res.gitUser){
+                            dispatch(gitLogin(res.gitUser.user))
+                        }else{
+                            dispatch(googleLogin(res.googleUser.user))
+                        }
+                    }
                     setUserData(res.gitUser.user)
                     setLoading(false)
                 }
