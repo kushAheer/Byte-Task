@@ -8,23 +8,10 @@ export const  gitAuth = async (req, res) => {
 }
 
 export const callBackFunction = async (req, res, next) => {
-    passport.authenticate('github', { failureRedirect: process.env.CLIENT_URL_LOGIN }, (err, user, info) => {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.redirect(process.env.CLIENT_URL_LOGIN);
-        }
-
-        req.logIn(user, (err) => {
-            if (err) {
-                return next(err);
-            }
-
-            const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.redirect(`${process.env.CLIENT_URL_LOGIN}?gittoken=${token}`);
-        });
-    })(req, res, next);
+    passport.authenticate('github', { failureRedirect: process.env.CLIENT_URL_LOGIN })(req, res, ()=>{
+        const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.redirect(`${process.env.CLIENT_URL_LOGIN}?gittoken=${token}`);
+    });
 };
 
 export const googleAuth = async (req, res) => {
@@ -63,7 +50,8 @@ export const loginSuccess = async (req, res) => {
                 type: 'github',
                 user,
             });
-        } else if (!gitToken && googleToken) {
+        } 
+        if (googleToken && !gitToken) {
             const user = jwt.decode(googleToken);
             return res.status(200).json({
                 success: true,
@@ -71,8 +59,9 @@ export const loginSuccess = async (req, res) => {
                 type: 'google',
                 user,
             });
-        } else if (gitToken && googleToken) {
-            // Handle the case where both tokens are present
+        }
+        if (gitToken && googleToken) {
+            
             const gitUser = jwt.decode(gitToken);
             const googleUser = jwt.decode(googleToken);
             return res.status(200).json({
