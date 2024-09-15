@@ -43,6 +43,9 @@ export const loginSuccess = async (req, res) => {
         // console.log(req);
 
         
+        // const accessToken = req.headers.authorization?.split(' ')[1];
+        
+        
         
 
         if (req.user) {
@@ -62,7 +65,14 @@ export const loginSuccess = async (req, res) => {
                 message: 'Login success',
                 user: req.user,
             })
+        }else{
+            res.status(401).json({
+                success: false,
+                message: 'Login failed',
+                req : req
+            });
         }
+        
     } catch (error) {
         return res.status(500).json({
             success: false,

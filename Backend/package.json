@@ -4,9 +4,10 @@
   "main": "server.js",
   "scripts": {
     "server": "nodemon server.js",
-    "build": "babel src -d dist"
+      "build": "babel . --ignore node_modules --out-dir dist",
+      "start": "node dist/server.js"
   },
-  "type": "module",
+  "type": "module" ,
   "author": "",
   "license": "ISC",
   "description": "",
@@ -28,5 +29,10 @@
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.25.6",
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4"
   }
 }
