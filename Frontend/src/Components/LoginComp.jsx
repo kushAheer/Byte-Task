@@ -22,6 +22,7 @@ function LoginComp() {
 		if (token) {
 			localStorage.setItem('token', token)
 		}
+		window.history.replaceState({}, document.title, "/login")
 		
 	},[])
 
