@@ -41,11 +41,13 @@ function useLogin() {
                     
                 }else if(res.success && res.type === "google"){
                     dispatch(googleLogin(res.user.user))
-                    setUserData(res.user)
+                    setUserData(res.user.user)
                     setLoading(false)
-                }else{
+                }else if(res.success && res.type === "both"){
+                    dispatch(gitLogin(res.gitUser.user))
+                    dispatch(googleLogin(res.googleUser.user))
+                    setUserData(res.gitUser.user)
                     setLoading(false)
-                    toast.error("Login failed")
                 }
                 
 

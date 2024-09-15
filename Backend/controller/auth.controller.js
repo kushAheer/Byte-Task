@@ -52,27 +52,42 @@ export const loginSuccess = async (req, res) => {
         
         // const accessToken = req.headers.authorization?.split(' ')[1];
         
-            const gitToken = req.headers.gittoken;
-            const googleToken = req.headers.googletoken;
-
-            
-            if(gitToken){
-                const user = jwt.decode(gitToken);
-                return res.status(200).json({
-                    success: true,
-                    message: 'Login success',
-                    type: user.type,
-                    user,
-                });
-            
-            }else{
-                const user = jwt.decode(googleToken);
-                return res.status(401).json({
-                    success: false,
-                    message: 'Login failed',
-                    user
-                });
-            }
+        const gitToken = req.headers.gittoken;
+        const googleToken = req.headers.googletoken;
+        
+        if (gitToken && !googleToken) {
+            const user = jwt.decode(gitToken);
+            return res.status(200).json({
+                success: true,
+                message: 'Login success with GitHub',
+                type: 'github',
+                user,
+            });
+        } else if (!gitToken && googleToken) {
+            const user = jwt.decode(googleToken);
+            return res.status(200).json({
+                success: true,
+                message: 'Login success with Google',
+                type: 'google',
+                user,
+            });
+        } else if (gitToken && googleToken) {
+            // Handle the case where both tokens are present
+            const gitUser = jwt.decode(gitToken);
+            const googleUser = jwt.decode(googleToken);
+            return res.status(200).json({
+                success: true,
+                message: 'Login success with both GitHub and Google',
+                type: 'both',
+                gitUser,
+                googleUser,
+            });
+        } else {
+            return res.status(401).json({
+                success: false,
+                message: 'Login failed, no valid token provided',
+            });
+        }
             
         
         
