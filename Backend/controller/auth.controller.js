@@ -52,8 +52,8 @@ export const loginSuccess = async (req, res) => {
         
         // const accessToken = req.headers.authorization?.split(' ')[1];
         
-            const gitToken = req.query.gittoken;
-            const googleToken = req.query.googletoken;
+            const gitToken = req.headers.gittoken;
+            const googleToken = req.headers.googletoken;
 
             
             if(gitToken){
