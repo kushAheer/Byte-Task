@@ -33,7 +33,7 @@ export const googleAuth = async (req, res) => {
 
 export const googleCallBack = async (req, res) => {
     passport.authenticate('google', { failureRedirect: process.env.CLIENT_URL_LOGIN })(req, res, () => {
-        const token = jwt.sign({ user , type : 'github' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ user: req.user , type : 'google'}, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.redirect(`${process.env.CLIENT_URL_LOGIN}?token=${token}`);
     });
 }
